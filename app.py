@@ -39,31 +39,41 @@ from threading import Thread
 def on_new_client(client_socket, addr):
     parser = ParserResponse()
     while True:
-        data = client_socket.recv(1024).decode("utf-8")
-        if not data:
+        try:
+            data = client_socket.recv(1024).decode("utf-8")
+            if not data:
+                break
+            parse = parser.parser_afeter_save(data)
+            print(parse)
+        except Exception as error:
+            print(error)
             break
-        parse = parser.parser_afeter_save(data)
-        print(parse)
     client_socket.close()
 
 
 def main():
     host = "0.0.0.0"  # allow any incoming connections
     port = 9953
+    try:
+        s = socket.socket()
+        s.bind((host, port))  # bind the socket to the port and ip address
 
-    s = socket.socket()
-    s.bind((host, port))  # bind the socket to the port and ip address
+        s.listen(5)  # wait for new connections
 
-    s.listen(5)  # wait for new connections
-
-    while True:
-        c, addr = s.accept()  # Establish connection with client.
-        # this returns a new socket object and the IP address of the client
-        print(f"New connection from: {addr}")
-        thread = Thread(target=on_new_client, args=(c, addr))  # create the thread
-        thread.start()  # start the thread
-    c.close()
-    thread.join()
+        while True:
+            c, addr = s.accept()  # Establish connection with client.
+            # this returns a new socket object and the IP address of the client
+            print(f"New connection from: {addr}")
+            thread = Thread(target=on_new_client, args=(c, addr))  # create the thread
+            thread.start()  # start the thread
+        c.close()
+        thread.join()
+    except KeyboardInterrupt:
+        print("Parado pelo usuario")
+        s.close()
+    except Exception as error:
+        print(error)
+        s.close()
 
 
 if __name__ == "__main__":
