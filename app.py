@@ -44,7 +44,7 @@ def on_new_client(client_socket, addr):
             if not data:
                 break
             parse = parser.parser_afeter_save(data)
-            print(parse)
+            # print(parse)
         except Exception as error:
             print(error)
             break
