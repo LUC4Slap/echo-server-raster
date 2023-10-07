@@ -22,6 +22,9 @@ class ParserResponse(object):
         self.bat_externa = ""
         self.qtd_satelites = ""
 
+    def hex_to_int(self, x):
+        return eval("0x" + x)
+
     def parser_afeter_save(self, response):
         dados = response.split(",")
         if "*ET" and "HB" in dados:
@@ -31,8 +34,10 @@ class ParserResponse(object):
             self.gps_ligado_desligado = dados[3]
             self.data_hex = dados[4]
             self.hora_hex = dados[5]
-            self.lat_hex = dados[6]
-            self.lng_hex = dados[7]
+            self.lat_hex = self.hex_to_int(dados[6])
+            self.lng_hex = self.hex_to_int(dados[7])
+            # self.lat_hex = self.hex_to_int('80BB8262')
+            # self.lng_hex = self.hex_to_int('81F3EF20')
             self.velocidade_hex = dados[8]
             self.direcao_hex = dados[9]
             self.status = dados[10]
@@ -52,3 +57,4 @@ class ParserResponse(object):
             print("JZ")
         elif "*ET" and "TX" in dados:
             print("TX")
+
