@@ -21,7 +21,7 @@ class ParserResponse(object):
         self.temperatura = ""
         self.bat_externa = ""
         self.qtd_satelites = ""
-    
+
     def hex_to_lat_or_lng_string(self, hex_lat_or_lng):
         negativo = False
         if hex_lat_or_lng.startswith("8"):
@@ -39,7 +39,12 @@ class ParserResponse(object):
 
     def parser_afeter_save(self, response):
         dados = response.split(",")
+        if "*ET" in dados:
+            self.parserBW3(dados)
+
+    def parserBW3(self, dados):
         if "*ET" and "HB" in dados:
+            # AQUI É QUANDO O RASTREADOR MANDA A STRING COM A LATITUDO E LONGITUDE
             self.hdr = dados[0]
             self.imei = dados[1]
             self.cmd_atualizado = dados[2]
@@ -48,8 +53,6 @@ class ParserResponse(object):
             self.hora_hex = dados[5]
             self.lat_hex = self.hex_to_lat_or_lng_string(dados[6])
             self.lng_hex = self.hex_to_lat_or_lng_string(dados[7])
-            # self.lat_hex = self.hex_to_int('80BB8262')
-            # self.lng_hex = self.hex_to_int('81F3EF20')
             self.velocidade_hex = dados[8]
             self.direcao_hex = dados[9]
             self.status = dados[10]
@@ -69,4 +72,3 @@ class ParserResponse(object):
             print("JZ")
         elif "*ET" and "TX" in dados:
             print("TX")
-
