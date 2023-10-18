@@ -59,11 +59,11 @@ def main():
         s.bind((host, port))  # bind the socket to the port and ip address
 
         s.listen(5)  # wait for new connections
-
         while True:
             c, addr = s.accept()  # Establish connection with client.
             # this returns a new socket object and the IP address of the client
             print(f"New connection from: {addr}")
+            print(c)
             thread = Thread(target=on_new_client, args=(c, addr))  # create the thread
             thread.start()  # start the thread
         c.close()
