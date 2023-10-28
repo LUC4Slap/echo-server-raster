@@ -1,5 +1,7 @@
-import datetime
+from datetime import datetime
 from saveReport import SaveReposts
+import random
+
 
 
 class ParserResponse(object):
@@ -26,6 +28,22 @@ class ParserResponse(object):
         self.bat_externa = ""
         self.qtd_satelites = ""
         self.DB = SaveReposts()
+    
+    def generate_random_coordinates(self):
+        # Limites geográficos de Campo Grande, Mato Grosso do Sul
+        min_latitude = -20.598000  # Latitude mínima
+        max_latitude = -20.428000  # Latitude máxima
+        min_longitude = -54.733000  # Longitude mínima
+        max_longitude = -54.465000  # Longitude máxima
+
+        # Gere uma latitude aleatória dentro dos limites
+        latitude = random.uniform(min_latitude, max_latitude)
+
+        # Gere uma longitude aleatória dentro dos limites
+        longitude = random.uniform(min_longitude, max_longitude)
+
+        return (latitude, longitude)
+
 
     def hex_to_lat_or_lng_string(self, hex_lat_or_lng):
         negativo = False
@@ -51,16 +69,15 @@ class ParserResponse(object):
     def parserBW3(self, dados):
         if "*ET" and "HB" in dados:
             # AQUI É QUANDO O RASTREADOR MANDA A STRING COM A LATITUDO E LONGITUDE
-            print(self.lat_hex)
-            print(self.lng_hex)
             self.saveContex(dados)
-            self.DB.saveReport(returnDadosJson(dados))
+            report_json = self.returnDadosJson(dados)
+            self.DB.saveReport(report_json)
         elif "*ET" and "JZ" in dados:
             print("JZ")
         elif "*ET" and "TX" in dados:
             print("TX")
 
-    def returnDadosJson(self):
+    def returnDadosJson(self, dados):
         json = {
             "hdr": self.hdr,
             "imei": self.imei,
@@ -83,18 +100,20 @@ class ParserResponse(object):
             "temperatura": self.temperatura,
             "bat_externa": self.bat_externa,
             "qtd_satelites": self.qtd_satelites,
+            "date_report": str(datetime.now())
         }
         return json
 
     def saveContex(self, dados):
+        self.lat_hex, self.lng_hex = self.generate_random_coordinates()
         self.hdr = dados[0]
         self.imei = dados[1]
         self.cmd_atualizacao = dados[2]
         self.gps_ligado_desligado = dados[3]
         self.data_hex = dados[4]
         self.hora_hex = dados[5]
-        self.lat_hex = self.hex_to_lat_or_lng_string(dados[6])
-        self.lng_hex = self.hex_to_lat_or_lng_string(dados[7])
+        # self.lat_hex = self.hex_to_lat_or_lng_string(dados[6])
+        # self.lng_hex = self.hex_to_lat_or_lng_string(dados[7])
         self.velocidade_hex = dados[8]
         self.direcao_hex = dados[9]
         self.status = dados[10]
